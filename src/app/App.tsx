@@ -20,7 +20,7 @@ export default function App() {
     const tempStyle = document.createElement('style');
     tempStyle.id = 'pdf-temp-colors';
     tempStyle.textContent = `
-      /* Переопределяем все CSS переменные с oklch на RGB */
+      /* Переопределяем цветовые переменные на RGB для PDF-рендера */
       :root.pdf-rendering-root {
         --background: #ffffff !important;
         --foreground: #252525 !important;
@@ -153,6 +153,40 @@ export default function App() {
     
     // Даем браузеру один кадр на применение временных стилей
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+
+    const replaceUnsupportedColorsInClone = (clonedDoc: Document) => {
+      const unsupportedColorRegex = /okl(?:ab|c[h])\([^)]+\)/g;
+      const helper = clonedDoc.createElement('span');
+      helper.style.display = 'none';
+      clonedDoc.body.appendChild(helper);
+      const view = clonedDoc.defaultView;
+
+      const toRgb = (value: string): string => {
+        if (!view) return value;
+        helper.style.color = '';
+        helper.style.color = value;
+        const resolved = view.getComputedStyle(helper).color;
+        return resolved || value;
+      };
+
+      clonedDoc.querySelectorAll('style').forEach((styleEl) => {
+        if (!styleEl.textContent || !unsupportedColorRegex.test(styleEl.textContent)) return;
+        unsupportedColorRegex.lastIndex = 0;
+        styleEl.textContent = styleEl.textContent.replace(unsupportedColorRegex, (match) => toRgb(match));
+      });
+
+      clonedDoc.querySelectorAll<HTMLElement>('[style]').forEach((node) => {
+        const inlineStyle = node.getAttribute('style');
+        if (!inlineStyle || !unsupportedColorRegex.test(inlineStyle)) return;
+        unsupportedColorRegex.lastIndex = 0;
+        node.setAttribute(
+          'style',
+          inlineStyle.replace(unsupportedColorRegex, (match) => toRgb(match)),
+        );
+      });
+
+      helper.remove();
+    };
     
     try {
       const html2pdfModule = await import('html2pdf.js');
@@ -179,6 +213,9 @@ export default function App() {
             scrollX: 0,
             scrollY: 0,
             windowWidth: exportWidthPx,
+            onclone: (clonedDoc: Document) => {
+              replaceUnsupportedColorsInClone(clonedDoc);
+            },
           },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['css', 'legacy'] },
