@@ -180,53 +180,55 @@ export default function App() {
     // Даем браузеру один кадр на применение временных стилей
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
     
-    let renderFrame: HTMLIFrameElement | null = null;
+    const renderCloneToCanvas = async (node: HTMLElement): Promise<HTMLCanvasElement> => {
+      const width = Math.ceil(node.scrollWidth);
+      const height = Math.ceil(node.scrollHeight);
+
+      const clonedNode = node.cloneNode(true) as HTMLElement;
+      inlineComputedStyles(node, clonedNode);
+      clonedNode.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+      const serializedNode = new XMLSerializer().serializeToString(clonedNode);
+      const svgMarkup = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+          <foreignObject x="0" y="0" width="100%" height="100%">
+            ${serializedNode}
+          </foreignObject>
+        </svg>
+      `;
+
+      const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      try {
+        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error('Failed to render SVG clone'));
+          img.src = url;
+        });
+
+        const scale = 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Canvas context is not available');
+        }
+
+        ctx.scale(scale, scale);
+        ctx.drawImage(image, 0, 0, width, height);
+        return canvas;
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    };
 
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import('html2canvas'),
-        import('jspdf'),
-      ]);
-
-      const clone = element.cloneNode(true) as HTMLElement;
-      inlineComputedStyles(element, clone);
-
-      renderFrame = document.createElement('iframe');
-      renderFrame.setAttribute('aria-hidden', 'true');
-      renderFrame.style.position = 'fixed';
-      renderFrame.style.left = '-100000px';
-      renderFrame.style.top = '0';
-      renderFrame.style.width = `${exportWidthPx}px`;
-      renderFrame.style.height = `${Math.max(element.scrollHeight, element.clientHeight)}px`;
-      renderFrame.style.opacity = '0';
-      document.body.appendChild(renderFrame);
-
-      const iframeDoc = renderFrame.contentDocument;
-      if (!iframeDoc) {
-        throw new Error('Unable to create isolated render document');
-      }
-
-      iframeDoc.open();
-      iframeDoc.write('<!doctype html><html><head><meta charset="utf-8" /></head><body style="margin:0;background:#fff;"></body></html>');
-      iframeDoc.close();
-      iframeDoc.body.appendChild(clone);
-
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        foreignObjectRendering: false,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: exportWidthPx,
-        windowHeight: clone.scrollHeight,
-        width: clone.scrollWidth,
-        height: clone.scrollHeight,
-      });
-
-      renderFrame.remove();
-      renderFrame = null;
+      const [{ jsPDF }] = await Promise.all([import('jspdf')]);
+      const canvas = await renderCloneToCanvas(element);
 
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -284,7 +286,6 @@ export default function App() {
       console.error('Ошибка при создании PDF:', error);
     } finally {
       // Удаляем временные стили
-      renderFrame?.remove();
       element.style.width = originalWidth;
       element.style.maxWidth = originalMaxWidth;
       document.documentElement.classList.remove('pdf-rendering-root');
