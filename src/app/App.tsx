@@ -19,14 +19,27 @@ export default function App() {
     tempStyle.id = 'pdf-temp-colors';
     tempStyle.textContent = `
       /* Переопределяем все CSS переменные с oklch на RGB */
-      .pdf-rendering {
+      :root.pdf-rendering-root {
+        --background: #ffffff !important;
         --foreground: #252525 !important;
+        --card: #ffffff !important;
         --card-foreground: #252525 !important;
         --popover: #ffffff !important;
         --popover-foreground: #252525 !important;
+        --primary: #030213 !important;
         --primary-foreground: #ffffff !important;
         --secondary: #f2f2f5 !important;
+        --secondary-foreground: #030213 !important;
+        --muted: #ececf0 !important;
         --muted-foreground: #717182 !important;
+        --accent: #e9ebef !important;
+        --accent-foreground: #030213 !important;
+        --destructive: #d4183d !important;
+        --destructive-foreground: #ffffff !important;
+        --border: rgba(0, 0, 0, 0.1) !important;
+        --input: transparent !important;
+        --input-background: #f3f3f5 !important;
+        --switch-background: #cbced4 !important;
         --ring: #b5b5b5 !important;
         --chart-1: #ff9f40 !important;
         --chart-2: #4bc0c0 !important;
@@ -35,12 +48,15 @@ export default function App() {
         --chart-5: #ff6384 !important;
         --sidebar: #fafafa !important;
         --sidebar-foreground: #252525 !important;
+        --sidebar-primary: #030213 !important;
         --sidebar-primary-foreground: #fafafa !important;
         --sidebar-accent: #f5f5f5 !important;
         --sidebar-accent-foreground: #333333 !important;
         --sidebar-border: #ebebeb !important;
         --sidebar-ring: #b5b5b5 !important;
-        
+      }
+
+      .pdf-rendering {
         /* Основной градиент */
         background: linear-gradient(to bottom right, #eff6ff, #ffffff, #eff6ff) !important;
       }
@@ -89,6 +105,7 @@ export default function App() {
     document.head.appendChild(tempStyle);
     
     // Добавляем временный класс
+    document.documentElement.classList.add('pdf-rendering-root');
     element.classList.add('pdf-rendering');
     
     // Даем браузеру один кадр на применение временных стилей
@@ -139,6 +156,7 @@ export default function App() {
       console.error('Ошибка при создании PDF:', error);
     } finally {
       // Удаляем временные стили
+      document.documentElement.classList.remove('pdf-rendering-root');
       element.classList.remove('pdf-rendering');
       tempStyle.remove();
     }
