@@ -6,6 +6,10 @@ import { EducationSection } from './components/education-section';
 import { useRef } from 'react';
 import { Download } from 'lucide-react';
 
+const PDF_MARGIN_MM = 10;
+const PDF_PAGE_WIDTH_MM = 210;
+const PDF_PAGE_HEIGHT_MM = 297;
+
 export default function App() {
   const resumeRef = useRef<HTMLDivElement>(null);
 
@@ -204,57 +208,63 @@ export default function App() {
     })();
     
     try {
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdfFactory =
-        (html2pdfModule as unknown as { default?: unknown }).default ?? html2pdfModule;
+      const [{ default: html2canvas }, jsPDFModule] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+      const { jsPDF } = jsPDFModule;
 
-      if (typeof html2pdfFactory !== 'function') {
-        throw new Error('html2pdf factory is not available');
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: false,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: exportWidthPx,
+        onclone: (clonedDoc: Document) => {
+          replaceUnsupportedColorsInClone(clonedDoc);
+
+          const clonedElement = clonedDoc.getElementById('resume-content');
+          if (!clonedElement) return;
+
+          const clonedNodes = [
+            clonedElement as HTMLElement,
+            ...Array.from(clonedElement.querySelectorAll<HTMLElement>('*')),
+          ];
+
+          for (let i = 0; i < clonedNodes.length; i += 1) {
+            const cssText = styleSnapshot[i];
+            if (!cssText) continue;
+            clonedNodes[i].setAttribute('style', cssText);
+          }
+
+          clonedDoc.querySelectorAll('link[rel="stylesheet"], style').forEach((node) => {
+            node.remove();
+          });
+        },
+      });
+
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      const contentWidth = PDF_PAGE_WIDTH_MM - PDF_MARGIN_MM * 2;
+      const contentHeight = PDF_PAGE_HEIGHT_MM - PDF_MARGIN_MM * 2;
+      const imageData = canvas.toDataURL('image/jpeg', 0.98);
+      const renderedHeight = (canvas.height * contentWidth) / canvas.width;
+      let remainingHeight = renderedHeight;
+      let yOffset = PDF_MARGIN_MM;
+
+      pdf.addImage(imageData, 'JPEG', PDF_MARGIN_MM, yOffset, contentWidth, renderedHeight);
+      remainingHeight -= contentHeight;
+
+      while (remainingHeight > 0) {
+        pdf.addPage();
+        yOffset = PDF_MARGIN_MM - (renderedHeight - remainingHeight);
+        pdf.addImage(imageData, 'JPEG', PDF_MARGIN_MM, yOffset, contentWidth, renderedHeight);
+        remainingHeight -= contentHeight;
       }
 
-      await (html2pdfFactory as () => {
-        set: (options: unknown) => { from: (source: HTMLElement) => { save: () => Promise<void> } };
-      })()
-        .set({
-          margin: [10, 10, 10, 10],
-          filename: 'Резюме Александр Илык iOS-разработчик.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: false,
-            allowTaint: false,
-            backgroundColor: '#ffffff',
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: exportWidthPx,
-            onclone: (clonedDoc: Document) => {
-              replaceUnsupportedColorsInClone(clonedDoc);
-
-              const clonedElement = clonedDoc.getElementById('resume-content');
-              if (!clonedElement) return;
-
-              const clonedNodes = [
-                clonedElement as HTMLElement,
-                ...Array.from(clonedElement.querySelectorAll<HTMLElement>('*')),
-              ];
-
-              for (let i = 0; i < clonedNodes.length; i += 1) {
-                const cssText = styleSnapshot[i];
-                if (!cssText) continue;
-                clonedNodes[i].setAttribute('style', cssText);
-              }
-
-              clonedDoc.querySelectorAll('link[rel="stylesheet"], style').forEach((node) => {
-                node.remove();
-              });
-            },
-          },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'] },
-        })
-        .from(element)
-        .save();
+      pdf.save('Резюме Александр Илык iOS-разработчик.pdf');
     } catch (error) {
       console.error('Ошибка при создании PDF:', error);
     } finally {
