@@ -13,6 +13,8 @@ export default function App() {
     if (!resumeRef.current) return;
 
     const element = resumeRef.current;
+    const originalWidth = element.style.width;
+    const originalMaxWidth = element.style.maxWidth;
     
     // Полностью переопределяем CSS переменные на RGB
     const tempStyle = document.createElement('style');
@@ -143,6 +145,11 @@ export default function App() {
     // Добавляем временный класс
     document.documentElement.classList.add('pdf-rendering-root');
     element.classList.add('pdf-rendering');
+
+    // Фиксируем "десктопную" ширину для одинакового PDF на любых устройствах
+    const exportWidthPx = 1240;
+    element.style.width = `${exportWidthPx}px`;
+    element.style.maxWidth = 'none';
     
     // Даем браузеру один кадр на применение временных стилей
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
@@ -161,7 +168,7 @@ export default function App() {
         foreignObjectRendering: false,
         scrollX: 0,
         scrollY: -window.scrollY,
-        windowWidth: document.documentElement.scrollWidth,
+        windowWidth: exportWidthPx,
         windowHeight: document.documentElement.scrollHeight,
         width: element.scrollWidth,
         height: element.scrollHeight,
@@ -178,20 +185,44 @@ export default function App() {
       const pageHeight = pdf.internal.pageSize.getHeight();
       const printableWidth = pageWidth - margin * 2;
       const printableHeight = pageHeight - margin * 2;
-      const imageHeight = (canvas.height * printableWidth) / canvas.width;
-      const imageData = canvas.toDataURL('image/jpeg', 0.98);
+      const pageAspect = printableHeight / printableWidth;
+      const pageHeightPx = Math.floor(canvas.width * pageAspect);
+      let renderedHeightPx = 0;
+      let pageIndex = 0;
 
-      let heightLeft = imageHeight;
-      let yPosition = margin;
+      while (renderedHeightPx < canvas.height) {
+        const sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedHeightPx);
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeightPx;
 
-      pdf.addImage(imageData, 'JPEG', margin, yPosition, printableWidth, imageHeight);
-      heightLeft -= printableHeight;
+        const context = pageCanvas.getContext('2d');
+        if (!context) {
+          throw new Error('Canvas context is not available');
+        }
 
-      while (heightLeft > 0) {
-        yPosition = margin - (imageHeight - heightLeft);
-        pdf.addPage();
-        pdf.addImage(imageData, 'JPEG', margin, yPosition, printableWidth, imageHeight);
-        heightLeft -= printableHeight;
+        context.drawImage(
+          canvas,
+          0,
+          renderedHeightPx,
+          canvas.width,
+          sliceHeightPx,
+          0,
+          0,
+          canvas.width,
+          sliceHeightPx
+        );
+
+        const pageImageData = pageCanvas.toDataURL('image/jpeg', 0.98);
+        const renderedPageHeightMm = (sliceHeightPx * printableWidth) / canvas.width;
+
+        if (pageIndex > 0) {
+          pdf.addPage();
+        }
+
+        pdf.addImage(pageImageData, 'JPEG', margin, margin, printableWidth, renderedPageHeightMm);
+        renderedHeightPx += sliceHeightPx;
+        pageIndex += 1;
       }
 
       pdf.save('Резюме Александр Илык iOS-разработчик.pdf');
@@ -199,6 +230,8 @@ export default function App() {
       console.error('Ошибка при создании PDF:', error);
     } finally {
       // Удаляем временные стили
+      element.style.width = originalWidth;
+      element.style.maxWidth = originalMaxWidth;
       document.documentElement.classList.remove('pdf-rendering-root');
       element.classList.remove('pdf-rendering');
       tempStyle.remove();
