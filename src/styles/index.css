@@ -1,12 +1,51 @@
 @import './fonts.css';
-@import './tailwind.css';
-@import './theme.css';
+
+:root {
+  --color-page-top: #eff6ff;
+  --color-page-bottom: #e9f0ff;
+  --color-card: #ffffff;
+  --color-text: #1f2937;
+  --color-muted: #4b5563;
+  --color-primary: #2563eb;
+  --color-primary-strong: #1d4ed8;
+  --color-line: #e5e7eb;
+  --color-line-muted: #9ca3af;
+  --shadow-card: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-header: 0 14px 32px rgba(37, 99, 235, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
 
 html,
 body,
 #root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--color-text);
+  background: linear-gradient(135deg, var(--color-page-top) 0%, #ffffff 50%, var(--color-page-bottom) 100%);
   -webkit-user-select: text;
   user-select: text;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+ul {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: auto;
 }
 
 #resume-content,
@@ -15,13 +54,383 @@ body,
   user-select: text !important;
 }
 
-#resume-content a,
-#resume-content button {
-  pointer-events: auto !important;
+.resume-page {
+  padding: 2rem 1rem;
 }
 
-a {
-  pointer-events: auto;
+.resume-shell {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.resume-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.resume-download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #ffffff;
+  background: var(--color-primary);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resume-download-button:hover {
+  background: var(--color-primary-strong);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+}
+
+.resume-header {
+  background: linear-gradient(90deg, #2563eb 0%, #1e3a8a 100%);
+  color: #ffffff;
+  border-radius: 0.875rem;
+  padding: 2rem;
+  box-shadow: var(--shadow-header);
+}
+
+.resume-header__layout {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+
+.resume-header__intro {
+  flex: 1;
+}
+
+.resume-header__name {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+}
+
+.resume-header__role {
+  font-size: 1.25rem;
+  color: #dbeafe;
+  margin-bottom: 1rem;
+}
+
+.resume-header__summary {
+  max-width: 42rem;
+  line-height: 1.8;
+  color: #dbeafe;
+}
+
+.resume-header__emphasis {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.resume-header__contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.resume-header__contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.resume-header__contact-link:hover {
+  color: #bfdbfe;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.resume-header__contact-static:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.resume-layout {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.resume-layout__main,
+.resume-layout__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.resume-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: 0.875rem;
+  box-shadow: var(--shadow-card);
+}
+
+.resume-card__header {
+  padding: 1.5rem 1.5rem 0.75rem;
+}
+
+.resume-card__content {
+  padding: 0.5rem 1.5rem 1.5rem;
+}
+
+.resume-card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.resume-title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resume-title-icon {
+  color: var(--color-primary);
+}
+
+.resume-total-experience {
+  margin-top: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.resume-subtitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.resume-category-title {
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.resume-stack-sm,
+.resume-stack-md,
+.resume-stack-lg {
+  display: flex;
+  flex-direction: column;
+}
+
+.resume-stack-sm {
+  gap: 0.75rem;
+}
+
+.resume-stack-md {
+  gap: 1rem;
+}
+
+.resume-stack-lg {
+  gap: 1.5rem;
+}
+
+.resume-badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resume-badge-list--spaced {
+  margin: 0.75rem 0;
+}
+
+.resume-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.resume-badge--blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.resume-badge--green {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.resume-badge--outline {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.resume-timeline-item {
+  padding-left: 1rem;
+  border-left: 4px solid var(--color-primary);
+}
+
+.resume-timeline-item--muted {
+  border-left-color: var(--color-line-muted);
+}
+
+.resume-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.resume-item-head--tight {
+  margin-bottom: 0.25rem;
+}
+
+.resume-item-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.resume-item-title--small {
+  font-size: 1rem;
+}
+
+.resume-item-company {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.resume-item-period {
+  font-size: 0.875rem;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+.resume-item-location {
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.resume-item-details {
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+.resume-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #4b5563;
+}
+
+.resume-list-item {
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.resume-project-item {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.resume-project-item:hover {
+  background: #f3f4f6;
+}
+
+.resume-project-description {
+  color: #374151;
+  white-space: pre-line;
+}
+
+.resume-text-blue-strong {
+  color: var(--color-primary-strong);
+}
+
+.resume-cert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.resume-cert-content {
+  flex: 1;
+}
+
+.resume-cert-title {
+  font-weight: 600;
+}
+
+.resume-dot {
+  margin-top: 0.55rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  .resume-header__layout,
+  .resume-item-head {
+    flex-direction: column;
+  }
+
+  .resume-item-period {
+    white-space: normal;
+  }
+
+  .resume-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .resume-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .resume-header,
+  .resume-card__header,
+  .resume-card__content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .resume-header {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .resume-header__name {
+    font-size: 1.8rem;
+  }
+
+  .resume-header__role {
+    font-size: 1.1rem;
+  }
+
+  .resume-toolbar {
+    justify-content: stretch;
+  }
+
+  .resume-download-button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media print {
@@ -29,11 +438,24 @@ a {
     size: A4;
     margin: 10mm;
   }
-  
+
   body {
-    background: white !important;
+    background: #ffffff !important;
   }
-  
+
+  .resume-page {
+    padding: 0;
+  }
+
+  .resume-toolbar {
+    display: none;
+  }
+
+  .resume-card,
+  .resume-header {
+    box-shadow: none;
+  }
+
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;

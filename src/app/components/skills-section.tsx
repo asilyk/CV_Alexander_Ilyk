@@ -1,6 +1,3 @@
-import { Badge } from './ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-
 export function SkillsSection() {
   const skills = {
     'Языки программирования': ['Swift', 'Objective-C', 'Python', 'Kotlin'],
@@ -59,26 +56,26 @@ export function SkillsSection() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">Технические навыки</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+    <section className="resume-card">
+      <div className="resume-card__header">
+        <h2 className="resume-card__title">Технические навыки</h2>
+      </div>
+      <div className="resume-card__content">
+        <div className="resume-stack-md">
           {Object.entries(skills).map(([category, items]) => (
             <div key={category}>
-              <h3 className="font-semibold text-gray-700 mb-2">{category}</h3>
-              <div className="flex flex-wrap gap-2">
+              <h3 className="resume-category-title">{category}</h3>
+              <div className="resume-badge-list">
                 {items.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
+                  <span key={skill} className="resume-badge resume-badge--blue">
                     {skill}
-                  </Badge>
+                  </span>
                 ))}
               </div>
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

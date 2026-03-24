@@ -2,42 +2,40 @@ import { Mail, Phone, MapPin, Linkedin, Github, Send } from 'lucide-react';
 
 export function ResumeHeader() {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-lg shadow-lg">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div className="flex-1">
-          <h1 className="text-4xl font-bold mb-2">Александр Илык</h1>
-          <h2 className="text-xl text-blue-100 mb-4">Middle+ iOS Developer</h2>
-          <p className="text-blue-100 max-w-2xl leading-loose">
-            <span className="text-white font-semibold">Middle+ iOS разработчик</span> с 4+ годами коммерческого опыта<br />
-            Тимлид проекта <span className="text-white font-semibold">indoor-навигации</span> и создания цифровых двойников зданий<br />
+    <header className="resume-header">
+      <div className="resume-header__layout">
+        <div className="resume-header__intro">
+          <h1 className="resume-header__name">Александр Илык</h1>
+          <h2 className="resume-header__role">Middle+ iOS Developer</h2>
+          <p className="resume-header__summary">
+            <span className="resume-header__emphasis">Middle+ iOS разработчик</span> с 4+ годами коммерческого опыта
+            <br />
+            Тимлид проекта <span className="resume-header__emphasis">indoor-навигации</span> и создания цифровых двойников зданий
+            <br />
             Поддержка и разработка приложения с{' '}
-            <span className="text-white font-semibold">14 000+ скачиваний</span><br />
-            Специализируюсь на <span className="text-white font-semibold">Swift</span>,{' '}
-            <span className="text-white font-semibold">SwiftUI</span>,{' '}
-            <span className="text-white font-semibold">UIKit</span> и{' '}
-            <span className="text-white font-semibold">Kotlin Multiplatform</span>
+            <span className="resume-header__emphasis">14 000+ скачиваний</span>
+            <br />
+            Специализируюсь на <span className="resume-header__emphasis">Swift</span>,{' '}
+            <span className="resume-header__emphasis">SwiftUI</span>,{' '}
+            <span className="resume-header__emphasis">UIKit</span> и{' '}
+            <span className="resume-header__emphasis">Kotlin Multiplatform</span>
           </p>
         </div>
-        
-        <div className="flex flex-col gap-2 text-sm">
-          <a href="mailto:asilyk112@gmail.com" className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline">
+
+        <div className="resume-header__contacts">
+          <a href="mailto:asilyk112@gmail.com" className="resume-header__contact-link">
             <Mail size={16} />
             <span>asilyk112@gmail.com</span>
           </a>
-          <a href="tel:+79067319225" className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline">
+          <a href="tel:+79067319225" className="resume-header__contact-link">
             <Phone size={16} />
             <span>+7 (906) 731-92-25</span>
           </a>
-          <div className="flex items-center gap-2">
+          <div className="resume-header__contact-link resume-header__contact-static">
             <MapPin size={16} />
             <span>Москва, Россия</span>
           </div>
-          <a
-            href="https://t.me/asilyk"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline"
-          >
+          <a href="https://t.me/asilyk" target="_blank" rel="noopener noreferrer" className="resume-header__contact-link">
             <Send size={16} />
             <span>@asilyk</span>
           </a>
@@ -45,7 +43,7 @@ export function ResumeHeader() {
             href="https://linkedin.com/in/asilyk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline"
+            className="resume-header__contact-link"
           >
             <Linkedin size={16} />
             <span>linkedin.com/in/asilyk/</span>
@@ -54,13 +52,13 @@ export function ResumeHeader() {
             href="https://github.com/asilyk"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline"
+            className="resume-header__contact-link"
           >
             <Github size={16} />
             <span>github.com/asilyk</span>
           </a>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
