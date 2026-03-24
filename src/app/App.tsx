@@ -187,6 +187,21 @@ export default function App() {
 
       helper.remove();
     };
+
+    const styleSnapshot = (() => {
+      const nodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>('*'))];
+      return nodes.map((node) => {
+        const computed = window.getComputedStyle(node);
+        const declarations: string[] = [];
+        for (let i = 0; i < computed.length; i += 1) {
+          const property = computed.item(i);
+          const value = computed.getPropertyValue(property);
+          if (!value) continue;
+          declarations.push(`${property}:${value};`);
+        }
+        return declarations.join('');
+      });
+    })();
     
     try {
       const html2pdfModule = await import('html2pdf.js');
@@ -215,6 +230,24 @@ export default function App() {
             windowWidth: exportWidthPx,
             onclone: (clonedDoc: Document) => {
               replaceUnsupportedColorsInClone(clonedDoc);
+
+              const clonedElement = clonedDoc.getElementById('resume-content');
+              if (!clonedElement) return;
+
+              const clonedNodes = [
+                clonedElement as HTMLElement,
+                ...Array.from(clonedElement.querySelectorAll<HTMLElement>('*')),
+              ];
+
+              for (let i = 0; i < clonedNodes.length; i += 1) {
+                const cssText = styleSnapshot[i];
+                if (!cssText) continue;
+                clonedNodes[i].setAttribute('style', cssText);
+              }
+
+              clonedDoc.querySelectorAll('link[rel="stylesheet"], style').forEach((node) => {
+                node.remove();
+              });
             },
           },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
