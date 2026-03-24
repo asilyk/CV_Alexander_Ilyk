@@ -9,6 +9,17 @@ body,
   user-select: text;
 }
 
+#resume-content,
+#resume-content * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+#resume-content a,
+#resume-content button {
+  pointer-events: auto !important;
+}
+
 a {
   pointer-events: auto;
 }

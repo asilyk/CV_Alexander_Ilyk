@@ -4,7 +4,6 @@ import { ExperienceSection } from './components/experience-section';
 import { ProjectsSection } from './components/projects-section';
 import { EducationSection } from './components/education-section';
 import { useRef } from 'react';
-import html2pdf from 'html2pdf.js';
 import { Download } from 'lucide-react';
 
 export default function App() {
@@ -92,8 +91,8 @@ export default function App() {
     // Добавляем временный класс
     element.classList.add('pdf-rendering');
     
-    // Задержка для применения стилей
-    await new Promise(resolve => setTimeout(resolve, 200));
+    // Даем браузеру один кадр на применение временных стилей
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
     
     const opt = {
       margin: 10,
@@ -112,7 +111,22 @@ export default function App() {
     };
 
     try {
-      await html2pdf().set(opt).from(element).save();
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdfFactory =
+        (html2pdfModule as unknown as { default?: unknown }).default ?? html2pdfModule;
+
+      if (typeof html2pdfFactory !== 'function') {
+        throw new Error('html2pdf factory is not available');
+      }
+
+      await (html2pdfFactory as () => {
+        set: (options: unknown) => {
+          from: (source: HTMLElement) => { save: () => Promise<void> };
+        };
+      })()
+        .set(opt)
+        .from(element)
+        .save();
     } catch (error) {
       console.error('Ошибка при создании PDF:', error);
     } finally {
