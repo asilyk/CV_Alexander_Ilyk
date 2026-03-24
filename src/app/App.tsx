@@ -71,6 +71,21 @@ export default function App() {
       .pdf-rendering .bg-blue-50 {
         background-color: #eff6ff !important;
       }
+      .pdf-rendering .bg-blue-100 {
+        background-color: #dbeafe !important;
+      }
+      .pdf-rendering .bg-blue-700 {
+        background-color: #1d4ed8 !important;
+      }
+      .pdf-rendering .bg-gray-50 {
+        background-color: #f9fafb !important;
+      }
+      .pdf-rendering .bg-gray-100 {
+        background-color: #f3f4f6 !important;
+      }
+      .pdf-rendering .bg-green-50 {
+        background-color: #f0fdf4 !important;
+      }
       .pdf-rendering .text-gray-600 {
         color: #4b5563 !important;
       }
@@ -86,14 +101,35 @@ export default function App() {
       .pdf-rendering .text-blue-600 {
         color: #2563eb !important;
       }
+      .pdf-rendering .text-blue-700 {
+        color: #1d4ed8 !important;
+      }
+      .pdf-rendering .text-blue-100 {
+        color: #dbeafe !important;
+      }
+      .pdf-rendering .text-blue-200 {
+        color: #bfdbfe !important;
+      }
+      .pdf-rendering .text-green-700 {
+        color: #15803d !important;
+      }
+      .pdf-rendering .text-black {
+        color: #000000 !important;
+      }
       .pdf-rendering .text-white {
         color: #ffffff !important;
+      }
+      .pdf-rendering .border-blue-600 {
+        border-color: #2563eb !important;
       }
       .pdf-rendering .border-gray-200 {
         border-color: #e5e7eb !important;
       }
       .pdf-rendering .border-gray-300 {
         border-color: #d1d5db !important;
+      }
+      .pdf-rendering .border-gray-400 {
+        border-color: #9ca3af !important;
       }
       .pdf-rendering .shadow-sm {
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
@@ -122,6 +158,7 @@ export default function App() {
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
+        foreignObjectRendering: true,
       });
 
       const pdf = new jsPDF({
