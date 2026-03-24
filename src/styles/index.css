@@ -270,7 +270,8 @@ a {
 }
 
 .resume-badge--blue {
-  background: #eff6ff;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
   color: #1d4ed8;
 }
 
