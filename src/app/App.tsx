@@ -15,26 +15,43 @@ export default function App() {
 
     const element = resumeRef.current;
     
-    // Добавляем агрессивные стили для замены всех oklch цветов
+    // Полностью переопределяем CSS переменные на RGB
     const tempStyle = document.createElement('style');
     tempStyle.id = 'pdf-temp-colors';
     tempStyle.textContent = `
-      /* Переопределяем все цвета на RGB эквиваленты */
+      /* Переопределяем все CSS переменные с oklch на RGB */
       .pdf-rendering {
+        --foreground: #252525 !important;
+        --card-foreground: #252525 !important;
+        --popover: #ffffff !important;
+        --popover-foreground: #252525 !important;
+        --primary-foreground: #ffffff !important;
+        --secondary: #f2f2f5 !important;
+        --muted-foreground: #717182 !important;
+        --ring: #b5b5b5 !important;
+        --chart-1: #ff9f40 !important;
+        --chart-2: #4bc0c0 !important;
+        --chart-3: #36a2eb !important;
+        --chart-4: #ffce56 !important;
+        --chart-5: #ff6384 !important;
+        --sidebar: #fafafa !important;
+        --sidebar-foreground: #252525 !important;
+        --sidebar-primary-foreground: #fafafa !important;
+        --sidebar-accent: #f5f5f5 !important;
+        --sidebar-accent-foreground: #333333 !important;
+        --sidebar-border: #ebebeb !important;
+        --sidebar-ring: #b5b5b5 !important;
+        
+        /* Основной градиент */
         background: linear-gradient(to bottom right, #eff6ff, #ffffff, #eff6ff) !important;
       }
-      .pdf-rendering * {
-        background-color: transparent !important;
-        border-color: currentColor !important;
-      }
+      
+      /* Переопределяем все Tailwind классы */
       .pdf-rendering .bg-white {
         background-color: #ffffff !important;
       }
       .pdf-rendering .bg-blue-600 {
         background-color: #2563eb !important;
-      }
-      .pdf-rendering .bg-blue-700 {
-        background-color: #1d4ed8 !important;
       }
       .pdf-rendering .bg-blue-50 {
         background-color: #eff6ff !important;
@@ -63,12 +80,11 @@ export default function App() {
       .pdf-rendering .border-gray-300 {
         border-color: #d1d5db !important;
       }
-      /* Сбрасываем все градиенты кроме основного */
-      .pdf-rendering [class*="bg-gradient"] {
-        background: white !important;
+      .pdf-rendering .shadow-sm {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
       }
-      .pdf-rendering.min-h-screen {
-        background: linear-gradient(to bottom right, #eff6ff, #ffffff, #eff6ff) !important;
+      .pdf-rendering .shadow-md {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
       }
     `;
     document.head.appendChild(tempStyle);
@@ -76,8 +92,8 @@ export default function App() {
     // Добавляем временный класс
     element.classList.add('pdf-rendering');
     
-    // Небольшая задержка для применения стилей
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Задержка для применения стилей
+    await new Promise(resolve => setTimeout(resolve, 200));
     
     const opt = {
       margin: 10,
@@ -88,9 +104,8 @@ export default function App() {
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        ignoreElements: (element: Element) => {
-          // Игнорируем кнопку скачивания
-          return element.classList.contains('print:hidden');
+        ignoreElements: (el: Element) => {
+          return el.classList.contains('print:hidden');
         }
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
