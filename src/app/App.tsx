@@ -15,6 +15,32 @@ export default function App() {
     const element = resumeRef.current;
     const originalWidth = element.style.width;
     const originalMaxWidth = element.style.maxWidth;
+
+    const sanitizeOklch = (value: string): string => value.replace(/oklch\([^)]+\)/g, 'rgb(0, 0, 0)');
+
+    const inlineComputedStyles = (sourceEl: Element, targetEl: Element) => {
+      if (sourceEl instanceof HTMLElement && targetEl instanceof HTMLElement) {
+        const computed = window.getComputedStyle(sourceEl);
+        targetEl.style.cssText = '';
+
+        for (let i = 0; i < computed.length; i += 1) {
+          const property = computed[i];
+          if (property.startsWith('--')) continue;
+          const value = sanitizeOklch(computed.getPropertyValue(property));
+          targetEl.style.setProperty(property, value, computed.getPropertyPriority(property));
+        }
+      }
+
+      const sourceChildren = Array.from(sourceEl.children);
+      const targetChildren = Array.from(targetEl.children);
+      for (let i = 0; i < sourceChildren.length; i += 1) {
+        const sourceChild = sourceChildren[i];
+        const targetChild = targetChildren[i];
+        if (sourceChild && targetChild) {
+          inlineComputedStyles(sourceChild, targetChild);
+        }
+      }
+    };
     
     // Полностью переопределяем CSS переменные на RGB
     const tempStyle = document.createElement('style');
@@ -154,25 +180,53 @@ export default function App() {
     // Даем браузеру один кадр на применение временных стилей
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
     
+    let renderFrame: HTMLIFrameElement | null = null;
+
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
         import('html2canvas'),
         import('jspdf'),
       ]);
 
-      const canvas = await html2canvas(element, {
+      const clone = element.cloneNode(true) as HTMLElement;
+      inlineComputedStyles(element, clone);
+
+      renderFrame = document.createElement('iframe');
+      renderFrame.setAttribute('aria-hidden', 'true');
+      renderFrame.style.position = 'fixed';
+      renderFrame.style.left = '-100000px';
+      renderFrame.style.top = '0';
+      renderFrame.style.width = `${exportWidthPx}px`;
+      renderFrame.style.height = `${Math.max(element.scrollHeight, element.clientHeight)}px`;
+      renderFrame.style.opacity = '0';
+      document.body.appendChild(renderFrame);
+
+      const iframeDoc = renderFrame.contentDocument;
+      if (!iframeDoc) {
+        throw new Error('Unable to create isolated render document');
+      }
+
+      iframeDoc.open();
+      iframeDoc.write('<!doctype html><html><head><meta charset="utf-8" /></head><body style="margin:0;background:#fff;"></body></html>');
+      iframeDoc.close();
+      iframeDoc.body.appendChild(clone);
+
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
         foreignObjectRendering: false,
         scrollX: 0,
-        scrollY: -window.scrollY,
+        scrollY: 0,
         windowWidth: exportWidthPx,
-        windowHeight: document.documentElement.scrollHeight,
-        width: element.scrollWidth,
-        height: element.scrollHeight,
+        windowHeight: clone.scrollHeight,
+        width: clone.scrollWidth,
+        height: clone.scrollHeight,
       });
+
+      renderFrame.remove();
+      renderFrame = null;
 
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -230,6 +284,7 @@ export default function App() {
       console.error('Ошибка при создании PDF:', error);
     } finally {
       // Удаляем временные стили
+      renderFrame?.remove();
       element.style.width = originalWidth;
       element.style.maxWidth = originalMaxWidth;
       document.documentElement.classList.remove('pdf-rendering-root');
