@@ -8,10 +8,14 @@ export function ResumeHeader() {
           <h1 className="text-4xl font-bold mb-2">Александр Илык</h1>
           <h2 className="text-xl text-blue-100 mb-4">Middle+ iOS Developer</h2>
           <p className="text-blue-100 max-w-2xl leading-loose">
-            Middle+ iOS разработчик с 4+ годами коммерческого опыта<br />
-            Тимлид проекта indoor-навигации и создания цифровых двойников зданий<br />
-            Поддержка и разработка приложения с 14 000+ скачиваний<br />
-            Специализируюсь на Swift, SwiftUI, UIKit и Kotlin Multiplatform
+            <span className="text-white font-semibold">Middle+ iOS разработчик</span> с 4+ годами коммерческого опыта<br />
+            Тимлид проекта <span className="text-white font-semibold">indoor-навигации</span> и создания цифровых двойников зданий<br />
+            Поддержка и разработка приложения с{' '}
+            <span className="text-white font-semibold">14 000+ скачиваний</span><br />
+            Специализируюсь на <span className="text-white font-semibold">Swift</span>,{' '}
+            <span className="text-white font-semibold">SwiftUI</span>,{' '}
+            <span className="text-white font-semibold">UIKit</span> и{' '}
+            <span className="text-white font-semibold">Kotlin Multiplatform</span>
           </p>
         </div>
         
