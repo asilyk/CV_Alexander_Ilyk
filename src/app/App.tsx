@@ -16,32 +16,6 @@ export default function App() {
     const originalWidth = element.style.width;
     const originalMaxWidth = element.style.maxWidth;
 
-    const sanitizeOklch = (value: string): string => value.replace(/oklch\([^)]+\)/g, 'rgb(0, 0, 0)');
-
-    const inlineComputedStyles = (sourceEl: Element, targetEl: Element) => {
-      if (sourceEl instanceof HTMLElement && targetEl instanceof HTMLElement) {
-        const computed = window.getComputedStyle(sourceEl);
-        targetEl.style.cssText = '';
-
-        for (let i = 0; i < computed.length; i += 1) {
-          const property = computed[i];
-          if (property.startsWith('--')) continue;
-          const value = sanitizeOklch(computed.getPropertyValue(property));
-          targetEl.style.setProperty(property, value, computed.getPropertyPriority(property));
-        }
-      }
-
-      const sourceChildren = Array.from(sourceEl.children);
-      const targetChildren = Array.from(targetEl.children);
-      for (let i = 0; i < sourceChildren.length; i += 1) {
-        const sourceChild = sourceChildren[i];
-        const targetChild = targetChildren[i];
-        if (sourceChild && targetChild) {
-          inlineComputedStyles(sourceChild, targetChild);
-        }
-      }
-    };
-    
     // Полностью переопределяем CSS переменные на RGB
     const tempStyle = document.createElement('style');
     tempStyle.id = 'pdf-temp-colors';
@@ -180,108 +154,37 @@ export default function App() {
     // Даем браузеру один кадр на применение временных стилей
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
     
-    const renderCloneToCanvas = async (node: HTMLElement): Promise<HTMLCanvasElement> => {
-      const width = Math.ceil(node.scrollWidth);
-      const height = Math.ceil(node.scrollHeight);
-
-      const clonedNode = node.cloneNode(true) as HTMLElement;
-      inlineComputedStyles(node, clonedNode);
-      clonedNode.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-
-      const serializedNode = new XMLSerializer().serializeToString(clonedNode);
-      const svgMarkup = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-          <foreignObject x="0" y="0" width="100%" height="100%">
-            ${serializedNode}
-          </foreignObject>
-        </svg>
-      `;
-
-      const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-
-      try {
-        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = () => reject(new Error('Failed to render SVG clone'));
-          img.src = url;
-        });
-
-        const scale = 2;
-        const canvas = document.createElement('canvas');
-        canvas.width = width * scale;
-        canvas.height = height * scale;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          throw new Error('Canvas context is not available');
-        }
-
-        ctx.scale(scale, scale);
-        ctx.drawImage(image, 0, 0, width, height);
-        return canvas;
-      } finally {
-        URL.revokeObjectURL(url);
-      }
-    };
-
     try {
-      const [{ jsPDF }] = await Promise.all([import('jspdf')]);
-      const canvas = await renderCloneToCanvas(element);
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdfFactory =
+        (html2pdfModule as unknown as { default?: unknown }).default ?? html2pdfModule;
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
-
-      const margin = 10;
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const printableWidth = pageWidth - margin * 2;
-      const printableHeight = pageHeight - margin * 2;
-      const pageAspect = printableHeight / printableWidth;
-      const pageHeightPx = Math.floor(canvas.width * pageAspect);
-      let renderedHeightPx = 0;
-      let pageIndex = 0;
-
-      while (renderedHeightPx < canvas.height) {
-        const sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedHeightPx);
-        const pageCanvas = document.createElement('canvas');
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = sliceHeightPx;
-
-        const context = pageCanvas.getContext('2d');
-        if (!context) {
-          throw new Error('Canvas context is not available');
-        }
-
-        context.drawImage(
-          canvas,
-          0,
-          renderedHeightPx,
-          canvas.width,
-          sliceHeightPx,
-          0,
-          0,
-          canvas.width,
-          sliceHeightPx
-        );
-
-        const pageImageData = pageCanvas.toDataURL('image/jpeg', 0.98);
-        const renderedPageHeightMm = (sliceHeightPx * printableWidth) / canvas.width;
-
-        if (pageIndex > 0) {
-          pdf.addPage();
-        }
-
-        pdf.addImage(pageImageData, 'JPEG', margin, margin, printableWidth, renderedPageHeightMm);
-        renderedHeightPx += sliceHeightPx;
-        pageIndex += 1;
+      if (typeof html2pdfFactory !== 'function') {
+        throw new Error('html2pdf factory is not available');
       }
 
-      pdf.save('Резюме Александр Илык iOS-разработчик.pdf');
+      await (html2pdfFactory as () => {
+        set: (options: unknown) => { from: (source: HTMLElement) => { save: () => Promise<void> } };
+      })()
+        .set({
+          margin: [10, 10, 10, 10],
+          filename: 'Резюме Александр Илык iOS-разработчик.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: false,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: exportWidthPx,
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] },
+        })
+        .from(element)
+        .save();
     } catch (error) {
       console.error('Ошибка при создании PDF:', error);
     } finally {
