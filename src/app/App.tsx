@@ -97,7 +97,7 @@ export default function App() {
     
     const opt = {
       margin: 10,
-      filename: 'Alexandr_Ilyk_iOS_Developer_Resume.pdf',
+      filename: 'Резюме Александр Илык iOS-разработчик.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2,
