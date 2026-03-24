@@ -158,7 +158,13 @@ export default function App() {
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        foreignObjectRendering: true,
+        foreignObjectRendering: false,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
       });
 
       const pdf = new jsPDF({
