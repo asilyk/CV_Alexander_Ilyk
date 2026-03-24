@@ -5,7 +5,10 @@ export function ResumeHeader() {
     <header className="resume-header">
       <div className="resume-header__layout">
         <div className="resume-header__intro">
-          <h1 className="resume-header__name">Александр Илык</h1>
+          <h1 className="resume-header__name">
+            <span className="resume-header__name-first">Александр</span>
+            <span className="resume-header__name-last">Илык</span>
+          </h1>
           <h2 className="resume-header__role">Middle+ iOS Developer</h2>
           <p className="resume-header__summary">
             <span className="resume-header__emphasis">Middle+ iOS разработчик</span> с 4+ годами коммерческого опыта

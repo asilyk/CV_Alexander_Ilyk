@@ -146,19 +146,41 @@ export default function App() {
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
       const contentWidth = PDF_PAGE_WIDTH_MM - PDF_MARGIN_MM * 2;
       const contentHeight = PDF_PAGE_HEIGHT_MM - PDF_MARGIN_MM * 2;
-      const imageData = canvas.toDataURL('image/jpeg', 0.98);
-      const renderedHeight = (canvas.height * contentWidth) / canvas.width;
-      let remainingHeight = renderedHeight;
-      let yOffset = PDF_MARGIN_MM;
+      const pixelsPerMm = canvas.width / contentWidth;
+      const pageHeightPx = Math.max(1, Math.floor(contentHeight * pixelsPerMm));
+      const totalPages = Math.ceil(canvas.height / pageHeightPx);
 
-      pdf.addImage(imageData, 'JPEG', PDF_MARGIN_MM, yOffset, contentWidth, renderedHeight);
-      remainingHeight -= contentHeight;
+      for (let pageIndex = 0; pageIndex < totalPages; pageIndex += 1) {
+        if (pageIndex > 0) {
+          pdf.addPage();
+        }
 
-      while (remainingHeight > 0) {
-        pdf.addPage();
-        yOffset = PDF_MARGIN_MM - (renderedHeight - remainingHeight);
-        pdf.addImage(imageData, 'JPEG', PDF_MARGIN_MM, yOffset, contentWidth, renderedHeight);
-        remainingHeight -= contentHeight;
+        const sourceY = pageIndex * pageHeightPx;
+        const sliceHeightPx = Math.min(pageHeightPx, canvas.height - sourceY);
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeightPx;
+
+        const ctx = pageCanvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Canvas 2D context is not available');
+        }
+
+        ctx.drawImage(
+          canvas,
+          0,
+          sourceY,
+          canvas.width,
+          sliceHeightPx,
+          0,
+          0,
+          canvas.width,
+          sliceHeightPx,
+        );
+
+        const imageData = pageCanvas.toDataURL('image/png');
+        const pageImageHeightMm = (sliceHeightPx / canvas.width) * contentWidth;
+        pdf.addImage(imageData, 'PNG', PDF_MARGIN_MM, PDF_MARGIN_MM, contentWidth, pageImageHeightMm);
       }
 
       pdf.save('Резюме Александр Илык iOS-разработчик.pdf');
