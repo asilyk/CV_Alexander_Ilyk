@@ -19,9 +19,9 @@ export function ProjectsSection() {
       technologies: [],
       highlights: [
         <>Создание <span className="text-blue-700">цифровых двойников зданий</span> с детализацией до уровня помещений</>,
-        <>Интеграция в <span className="text-blue-700">университетские системы</span> для повышения процессной и хозяйственной эффективности</>,
+        'Интеграция в университетские системы для повышения процессной и хозяйственной эффективности',
         <>Реализовал систему навигации по <span className="text-blue-700">2019 помещениям</span> с построением <span className="text-blue-700">1млн+ маршрутов</span></>,
-        <><span className="text-blue-700">90 отрисованных планов зданий</span>, актуальных на конец 2025 года</>,
+        <><span className="text-blue-700">90 планов зданий</span>, актуальных на конец 2025 года</>,
         <>Организация навигации на <span className="text-blue-700">22 мероприятиях</span> и Днях открытых дверей</>,
         <><span className="text-blue-700">4708 пользователей сайта</span> и <span className="text-blue-700">2346 пользователей бота</span> в beta-тестировании</>,
         <><span className="text-blue-700">1812 интерактивных помещений</span> с возможностью построения маршрутов</>
@@ -33,8 +33,8 @@ export function ProjectsSection() {
       technologies: ['SwiftUI', 'OpenAI API', 'Swift Data'],
       highlights: [
         <>Генерация роудмапов через <span className="text-blue-700">OpenAI API</span></>,
-        <>Отслеживание и трекинг <span className="text-blue-700">прогресса задач</span></>,
-        <>Интеграция с <span className="text-blue-700">календарем и напоминаниями</span></>
+        'Отслеживание и трекинг прогресса задач',
+        'Интеграция с календарем и напоминаниями'
       ]
     },
     {
@@ -43,8 +43,8 @@ export function ProjectsSection() {
       technologies: ['UIKit', 'HealthKit', 'WatchKit', 'CloudKit'],
       highlights: [
         <>Синхронизация данных между <span className="text-blue-700">iPhone и Apple Watch</span></>,
-        <>Отслеживание <span className="text-blue-700">20+ видов тренировок</span></>,
-        <>Поддержка <span className="text-blue-700">оффлайн-режима</span></>
+        'Отслеживание 20+ видов тренировок',
+        'Поддержка оффлайн-режима'
       ]
     },
     {
@@ -52,9 +52,9 @@ export function ProjectsSection() {
       description: 'Минималистичное iOS погодное приложение с красивыми анимациями',
       technologies: ['SwiftUI', 'Core Animation', 'REST API', 'MapKit'],
       highlights: [
-        <>Анимированные <span className="text-blue-700">погодные эффекты</span></>,
-        <>Интеграция с <span className="text-blue-700">OpenWeatherMap API</span></>,
-        <>Поддержка <span className="text-blue-700">виджетов iOS 14+</span></>
+        'Анимированные погодные эффекты',
+        'Интеграция с OpenWeatherMap API',
+        'Поддержка виджетов iOS 14+'
       ]
     }
   ];
