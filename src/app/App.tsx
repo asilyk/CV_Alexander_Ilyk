@@ -105,7 +105,7 @@ export default function App() {
         backgroundColor: '#ffffff',
         logging: false,
         ignoreElements: (el: Element) => {
-          return el.classList.contains('print:hidden');
+          return el.classList.contains('print:hidden') || el.closest('[data-no-pdf="true"]') !== null;
         }
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -123,10 +123,11 @@ export default function App() {
   };
 
   return (
-    <div ref={resumeRef} className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-8 px-4 print:bg-white print:py-0">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-8 px-4 print:bg-white print:py-0">
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex justify-end mb-4 print:hidden">
           <button
+            data-no-pdf="true"
             onClick={handleDownloadPDF}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl font-semibold"
           >
@@ -135,7 +136,7 @@ export default function App() {
           </button>
         </div>
 
-        <div id="resume-content">
+        <div id="resume-content" ref={resumeRef} className="select-text">
           <ResumeHeader />
         
           <div className="grid md:grid-cols-3 gap-6">

@@ -17,11 +17,11 @@ export function ResumeHeader() {
         </div>
         
         <div className="flex flex-col gap-2 text-sm">
-          <a href="mailto:asilyk112@gmail.com" className="flex items-center gap-2 hover:text-blue-200 transition-colors">
+          <a href="mailto:asilyk112@gmail.com" className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline">
             <Mail size={16} />
             <span>asilyk112@gmail.com</span>
           </a>
-          <a href="tel:+79067319225" className="flex items-center gap-2 hover:text-blue-200 transition-colors">
+          <a href="tel:+79067319225" className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline">
             <Phone size={16} />
             <span>+7 (906) 731-92-25</span>
           </a>
@@ -29,15 +29,30 @@ export function ResumeHeader() {
             <MapPin size={16} />
             <span>Москва, Россия</span>
           </div>
-          <a href="https://t.me/asilyk" className="flex items-center gap-2 hover:text-blue-200 transition-colors">
+          <a
+            href="https://t.me/asilyk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline"
+          >
             <Send size={16} />
             <span>@asilyk</span>
           </a>
-          <a href="https://linkedin.com/in/asilyk/" className="flex items-center gap-2 hover:text-blue-200 transition-colors">
+          <a
+            href="https://linkedin.com/in/asilyk/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline"
+          >
             <Linkedin size={16} />
             <span>linkedin.com/in/asilyk/</span>
           </a>
-          <a href="https://github.com/asilyk" className="flex items-center gap-2 hover:text-blue-200 transition-colors">
+          <a
+            href="https://github.com/asilyk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-blue-200 transition-colors underline-offset-3 hover:underline focus-visible:underline"
+          >
             <Github size={16} />
             <span>github.com/asilyk</span>
           </a>
