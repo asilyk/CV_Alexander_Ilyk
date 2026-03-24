@@ -17,7 +17,11 @@ export function ExperienceSection() {
       period: 'Ноябрь 2023 — настоящее время',
       description: 'Москва',
       achievements: [
-        <>Разработал и масштабировал <span className="text-blue-700">iOS-приложение</span> с аудиторией <span className="text-blue-700">14 000+ скачиваний</span></>,
+        <>
+          Разработал и масштабировал <span className="text-blue-700">iOS-приложение</span> с аудиторией{' '}
+          <span className="text-blue-700">14 000+ скачиваний</span> и рейтингом{' '}
+          <span className="text-blue-700">4.8</span>
+        </>,
         <>Выполнил миграцию на <span className="text-blue-700">SwiftUI</span>, повысив скорость разработки и упростив поддержку UI</>,
         <>Участвовал в <span className="text-blue-700">полном редизайне продукта</span> и внедрил единую дизайн-систему</>,
         <>Интегрировал <span className="text-blue-700">Kotlin Multiplatform (KMP)</span> для шаринга бизнес-логики между платформами и снижения дублирования кода</>,

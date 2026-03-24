@@ -94,39 +94,47 @@ export default function App() {
     // Даем браузеру один кадр на применение временных стилей
     await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
     
-    const opt = {
-      margin: 10,
-      filename: 'Резюме Александр Илык iOS-разработчик.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
-        ignoreElements: (el: Element) => {
-          return el.classList.contains('print:hidden') || el.closest('[data-no-pdf="true"]') !== null;
-        }
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
+      });
 
-    try {
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdfFactory =
-        (html2pdfModule as unknown as { default?: unknown }).default ?? html2pdfModule;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
 
-      if (typeof html2pdfFactory !== 'function') {
-        throw new Error('html2pdf factory is not available');
+      const margin = 10;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const printableWidth = pageWidth - margin * 2;
+      const printableHeight = pageHeight - margin * 2;
+      const imageHeight = (canvas.height * printableWidth) / canvas.width;
+      const imageData = canvas.toDataURL('image/jpeg', 0.98);
+
+      let heightLeft = imageHeight;
+      let yPosition = margin;
+
+      pdf.addImage(imageData, 'JPEG', margin, yPosition, printableWidth, imageHeight);
+      heightLeft -= printableHeight;
+
+      while (heightLeft > 0) {
+        yPosition = margin - (imageHeight - heightLeft);
+        pdf.addPage();
+        pdf.addImage(imageData, 'JPEG', margin, yPosition, printableWidth, imageHeight);
+        heightLeft -= printableHeight;
       }
 
-      await (html2pdfFactory as () => {
-        set: (options: unknown) => {
-          from: (source: HTMLElement) => { save: () => Promise<void> };
-        };
-      })()
-        .set(opt)
-        .from(element)
-        .save();
+      pdf.save('Резюме Александр Илык iOS-разработчик.pdf');
     } catch (error) {
       console.error('Ошибка при создании PDF:', error);
     } finally {
@@ -141,6 +149,7 @@ export default function App() {
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex justify-end mb-4 print:hidden">
           <button
+            type="button"
             data-no-pdf="true"
             onClick={handleDownloadPDF}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl font-semibold"
